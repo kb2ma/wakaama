@@ -65,8 +65,19 @@
 
 #ifdef LWM2M_WITH_LOGS
 #include <inttypes.h>
+#include "fmt.h"
 #define LOG(STR) lwm2m_printf("[%s:%d] " STR "\r\n", __func__ , __LINE__)
 #define LOG_ARG(FMT, ...) lwm2m_printf("[%s:%d] " FMT "\r\n", __func__ , __LINE__ , __VA_ARGS__)
+#define LOG_ARG1(FMT, VALUE)                                                        \
+{                                                                                   \
+    if (!strcmp(FMT, "PRId64")                                                      \
+    {                                                                               \
+        char int64_str[20];                                                         \
+        int64_str[fmt_s64_dec(int64_str, (VALUE))] = '\0';                          \
+        lwm2m_printf("[%s:%d] %s \r\n", __func__ , __LINE__ , int64_str);           \
+    }                                                                               \
+    else lwm2m_printf("[%s:%d] " FMT "\r\n", __func__ , __LINE__ , (VALUE));        \
+}
 #define LOG_URI(URI)                                                                \
 {                                                                                   \
     if ((URI) == NULL) lwm2m_printf("[%s:%d] NULL\r\n", __func__ , __LINE__);     \
@@ -112,6 +123,7 @@
 "Unknown"))))))
 #else
 #define LOG_ARG(FMT, ...)
+#define LOG_ARG1(FMT, VALUE)
 #define LOG(STR)
 #define LOG_URI(URI)
 #endif
